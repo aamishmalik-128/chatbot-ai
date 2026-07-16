@@ -29,3 +29,7 @@ export const LoginValidator=[
     body("email").trim().isEmail().withMessage("Actual Email is required"),
     body("password").trim().isLength({min:6}).withMessage("Password doesnot Match or is less than the required string" ),
 ]
+
+export const chatCompletionValidator =[
+    body("message").notEmpty().withMessage("Message is required")
+]

@@ -66,7 +66,7 @@ export const userLogin = async (
   try {
     const { email, password } = req.body;
     const user = await Users.findOne({ email });
-
+    console.log(req.body);
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -90,8 +90,35 @@ export const userLogin = async (
     res.cookie("auth_cookie",token,{path:"/",expires,httpOnly:true,signed:true})
     return res.status(200).json({
         message: "Login successful",
+        name:user.name,
+        email:user.email
       });
   } catch (error) {
     return res.status(401).json({ message: "Incorrect Password" });
+  }
+};
+
+// user-controller.ts (or wherever verifyUser belongs)
+export const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user?.email) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await Users.findOne({ email: req.user.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong verifying user",
+      cause: (error as Error).message,
+    });
   }
 };
